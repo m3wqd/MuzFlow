@@ -1,131 +1,137 @@
-from contextlib import asynccontextmanager
 from pathlib import Path
-import mimetypes
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from database import Base, engine, get_db
-import models
-
-from api.tracks import router as tracks_router
-from api.artists import router as artists_router
-from api.albums import router as albums_router
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    yield
-
-
-app = FastAPI(
-    title="MuzFlow",
-    description="Personal music streaming service",
-    version="0.1.0",
-    lifespan=lifespan,
+from api import (
+    tracks,
+    tags,
+    artists,
+    albums,
 )
 
 
-# =========================
+# =========================================================
+# APP
+# =========================================================
+
+app = FastAPI(
+    title="MuzFlow API",
+    description="Personal music streaming service",
+    version="1.0.0",
+)
+
+
+# =========================================================
 # CORS
-# =========================
+# =========================================================
 
 app.add_middleware(
     CORSMiddleware,
+
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
     ],
+
     allow_credentials=True,
+
     allow_methods=["*"],
+
     allow_headers=["*"],
 )
 
 
-# =========================
-# API ROUTERS
-# =========================
+# =========================================================
+# STORAGE
+# =========================================================
 
-app.include_router(tracks_router)
-app.include_router(artists_router)
-app.include_router(albums_router)
+STORAGE_DIR = Path("/storage")
+
+MUSIC_DIR = STORAGE_DIR / "music"
+
+COVERS_DIR = STORAGE_DIR / "covers"
 
 
-# =========================
-# STATIC STORAGE
-# =========================
+MUSIC_DIR.mkdir(
+    parents=True,
+    exist_ok=True,
+)
 
-app.mount(
-    "/storage",
-    StaticFiles(directory="/storage"),
-    name="storage",
+COVERS_DIR.mkdir(
+    parents=True,
+    exist_ok=True,
 )
 
 
-# =========================
+# =========================================================
+# STATIC FILES
+# =========================================================
+
+app.mount(
+    "/storage/music",
+    StaticFiles(
+        directory=str(MUSIC_DIR)
+    ),
+    name="music",
+)
+
+
+app.mount(
+    "/storage/covers",
+    StaticFiles(
+        directory=str(COVERS_DIR)
+    ),
+    name="covers",
+)
+
+
+# =========================================================
+# API ROUTERS
+# =========================================================
+
+app.include_router(
+    tracks.router
+)
+
+app.include_router(
+    tags.router
+)
+
+app.include_router(
+    artists.router
+)
+
+app.include_router(
+    albums.router
+)
+
+
+# =========================================================
 # ROOT
-# =========================
+# =========================================================
 
 @app.get("/")
 def root():
+
     return {
         "service": "MuzFlow",
-        "status": "ok",
+        "status": "online",
+        "version": "1.0.0",
     }
 
 
-# =========================
+# =========================================================
 # HEALTH CHECK
-# =========================
+# =========================================================
 
-@app.get("/api/health")
+@app.get("/health")
 def health():
+
     return {
-        "status": "ok",
+        "status": "ok"
     }
-
-
-# =========================
-# STREAM TRACK
-# =========================
-
-@app.get("/api/tracks/{track_id}/stream")
-def stream_track(
-    track_id: int,
-    db=Depends(get_db),
-):
-    track = (
-        db.query(models.Track)
-        .filter(models.Track.id == track_id)
-        .first()
-    )
-
-    if not track:
-        raise HTTPException(
-            status_code=404,
-            detail="Track not found",
-        )
-
-    file_path = Path(track.file_path)
-
-    if not file_path.exists():
-        raise HTTPException(
-            status_code=404,
-            detail="Audio file not found",
-        )
-
-    media_type = mimetypes.guess_type(
-        file_path.name
-    )[0]
-
-    if media_type is None:
-        media_type = "application/octet-stream"
-
-    return FileResponse(
-        file_path,
-        media_type=media_type,
-        filename=file_path.name,
-    )
