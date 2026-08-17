@@ -1,4 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import "./Player.css";
+
+
+const API_URL =
+  "http://localhost:8000";
+
 
 interface Track {
   id: number;
@@ -6,142 +17,370 @@ interface Track {
   artist: string | null;
   album: string | null;
   cover_path: string | null;
-  duration: number | null;
 }
+
 
 interface PlayerProps {
   track: Track | null;
-  onNext?: () => void;
-  onPrevious?: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
 }
 
-const API_URL = "http://localhost:8000";
 
-function Player({
+export default function Player({
   track,
   onNext,
   onPrevious,
 }: PlayerProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const [playing, setPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [volume, setVolume] = useState(1);
+  const audioRef =
+    useRef<HTMLAudioElement>(null);
+
+
+  const [isPlaying, setIsPlaying] =
+    useState(false);
+
+  const [currentTime, setCurrentTime] =
+    useState(0);
+
+  const [duration, setDuration] =
+    useState(0);
+
+  const [volume, setVolume] =
+    useState(1);
+
+
+  // =========================
+  // TRACK CHANGE
+  // =========================
 
   useEffect(() => {
-    if (!audioRef.current || !track) {
+
+    const audio =
+      audioRef.current;
+
+    if (!audio) {
       return;
     }
 
-    audioRef.current.src =
+
+    if (!track) {
+
+      audio.pause();
+
+      audio.removeAttribute(
+        "src"
+      );
+
+      audio.load();
+
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setDuration(0);
+
+      return;
+    }
+
+
+    const url =
       `${API_URL}/api/tracks/${track.id}/stream`;
 
-    audioRef.current.load();
 
-    audioRef.current
+    audio.src = url;
+
+    audio.load();
+
+    setCurrentTime(0);
+    setDuration(0);
+
+
+    audio
       .play()
       .then(() => {
-        setPlaying(true);
+        setIsPlaying(true);
       })
-      .catch(() => {
-        setPlaying(false);
+      .catch((error) => {
+
+        console.error(
+          "Cannot play audio:",
+          error
+        );
+
+        setIsPlaying(false);
+
       });
+
   }, [track]);
 
+
+  // =========================
+  // AUDIO EVENTS
+  // =========================
+
   useEffect(() => {
-    if (!audioRef.current) {
+
+    const audio =
+      audioRef.current;
+
+    if (!audio) {
       return;
     }
 
-    audioRef.current.volume = volume;
-  }, [volume]);
+
+    const timeUpdate =
+      () => {
+        setCurrentTime(
+          audio.currentTime
+        );
+      };
+
+
+    const loadedMetadata =
+      () => {
+        setDuration(
+          audio.duration || 0
+        );
+      };
+
+
+    const ended =
+      () => {
+
+        setIsPlaying(false);
+
+        setCurrentTime(0);
+
+        onNext();
+
+      };
+
+
+    audio.addEventListener(
+      "timeupdate",
+      timeUpdate
+    );
+
+    audio.addEventListener(
+      "loadedmetadata",
+      loadedMetadata
+    );
+
+    audio.addEventListener(
+      "ended",
+      ended
+    );
+
+
+    return () => {
+
+      audio.removeEventListener(
+        "timeupdate",
+        timeUpdate
+      );
+
+      audio.removeEventListener(
+        "loadedmetadata",
+        loadedMetadata
+      );
+
+      audio.removeEventListener(
+        "ended",
+        ended
+      );
+
+    };
+
+  }, [onNext]);
+
+
+  // =========================
+  // PLAY / PAUSE
+  // =========================
 
   function togglePlay() {
-    if (!audioRef.current || !track) {
+
+    const audio =
+      audioRef.current;
+
+
+    if (!audio || !track) {
       return;
     }
 
-    if (playing) {
-      audioRef.current.pause();
-      setPlaying(false);
-    } else {
-      audioRef.current
+
+    if (audio.paused) {
+
+      audio
         .play()
         .then(() => {
-          setPlaying(true);
+          setIsPlaying(true);
         })
         .catch(console.error);
+
+    } else {
+
+      audio.pause();
+
+      setIsPlaying(false);
+
     }
+
   }
 
-  function handleTimeUpdate() {
-    if (!audioRef.current) {
-      return;
-    }
 
-    setCurrentTime(
-      audioRef.current.currentTime
-    );
-  }
+  // =========================
+  // SEEK
+  // =========================
 
-  function handleSeek(
+  function seek(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    if (!audioRef.current) {
+
+    const value =
+      Number(event.target.value);
+
+
+    const audio =
+      audioRef.current;
+
+
+    if (!audio) {
       return;
     }
 
-    const time = Number(event.target.value);
 
-    audioRef.current.currentTime = time;
+    audio.currentTime =
+      value;
 
-    setCurrentTime(time);
+    setCurrentTime(value);
+
   }
 
-  function formatTime(seconds: number) {
-    if (!Number.isFinite(seconds)) {
+
+  // =========================
+  // VOLUME
+  // =========================
+
+  function changeVolume(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+
+    const value =
+      Number(event.target.value);
+
+
+    const audio =
+      audioRef.current;
+
+
+    if (!audio) {
+      return;
+    }
+
+
+    audio.volume =
+      value;
+
+    setVolume(value);
+
+  }
+
+
+  // =========================
+  // TIME
+  // =========================
+
+  function formatTime(
+    value: number
+  ) {
+
+    if (
+      !Number.isFinite(value)
+    ) {
       return "0:00";
     }
 
-    const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
 
-    return `${minutes}:${secs
-      .toString()
-      .padStart(2, "0")}`;
+    const minutes =
+      Math.floor(
+        value / 60
+      );
+
+
+    const seconds =
+      Math.floor(
+        value % 60
+      );
+
+
+    return (
+      `${minutes}:` +
+      `${seconds
+        .toString()
+        .padStart(2, "0")}`
+    );
+
   }
 
+
+  // =========================
+  // EMPTY
+  // =========================
+
   if (!track) {
+
     return (
-      <div className="player empty-player">
+      <div className="player player-empty">
+
+        <audio
+          ref={audioRef}
+        />
+
         <span>
           Выберите трек
         </span>
+
       </div>
     );
+
   }
 
+
+  // =========================
+  // PLAYER
+  // =========================
+
   return (
+
     <div className="player">
 
       <audio
         ref={audioRef}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={onNext}
+        preload="metadata"
       />
 
+
+      {/* TRACK */}
 
       <div className="player-track">
 
         <div className="player-cover">
 
           {track.cover_path ? (
+
             <img
-              src={`${API_URL}${track.cover_path}`}
-              alt=""
+              src={
+                `${API_URL}${track.cover_path}`
+              }
+              alt={track.title}
             />
+
           ) : (
-            <span>♪</span>
+
+            <div className="player-no-cover">
+              ♪
+            </div>
+
           )}
 
         </div>
@@ -154,7 +393,8 @@ function Player({
           </div>
 
           <div className="player-artist">
-            {track.artist ?? "Unknown Artist"}
+            {track.artist ??
+              "Unknown Artist"}
           </div>
 
         </div>
@@ -162,47 +402,78 @@ function Player({
       </div>
 
 
-      <div className="player-controls">
+      {/* CONTROLS */}
 
-        <button onClick={onPrevious}>
-          ⏮
-        </button>
+      <div className="player-center">
 
-        <button
-          className="play-button"
-          onClick={togglePlay}
-        >
-          {playing ? "⏸" : "▶"}
-        </button>
+        <div className="player-buttons">
 
-        <button onClick={onNext}>
-          ⏭
-        </button>
+          <button
+            className="player-button"
+            onClick={onPrevious}
+          >
+            ⏮
+          </button>
+
+
+          <button
+            className="player-play-button"
+            onClick={togglePlay}
+          >
+            {isPlaying
+              ? "❚❚"
+              : "▶"}
+          </button>
+
+
+          <button
+            className="player-button"
+            onClick={onNext}
+          >
+            ⏭
+          </button>
+
+        </div>
+
+
+        <div className="player-progress">
+
+          <span>
+            {formatTime(
+              currentTime
+            )}
+          </span>
+
+
+          <input
+            type="range"
+            min="0"
+            max={
+              duration || 0
+            }
+            step="0.1"
+            value={
+              Math.min(
+                currentTime,
+                duration || 0
+              )
+            }
+            onChange={seek}
+          />
+
+
+          <span>
+            {formatTime(
+              duration
+            )}
+          </span>
+
+        </div>
 
       </div>
 
 
-      <div className="player-progress">
-
-        <span>
-          {formatTime(currentTime)}
-        </span>
-
-        <input
-          type="range"
-          min="0"
-          max={track.duration ?? 0}
-          step="0.1"
-          value={currentTime}
-          onChange={handleSeek}
-        />
-
-        <span>
-          {formatTime(track.duration ?? 0)}
-        </span>
-
-      </div>
-
+      {/* VOLUME */}
 
       <div className="player-volume">
 
@@ -210,23 +481,21 @@ function Player({
           🔊
         </span>
 
+
         <input
           type="range"
           min="0"
           max="1"
           step="0.01"
           value={volume}
-          onChange={(event) =>
-            setVolume(
-              Number(event.target.value)
-            )
+          onChange={
+            changeVolume
           }
-          />
+        />
 
       </div>
 
     </div>
+
   );
 }
-
-export default Player;

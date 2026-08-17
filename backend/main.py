@@ -3,6 +3,7 @@ from pathlib import Path
 import mimetypes
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -28,19 +29,45 @@ app = FastAPI(
 )
 
 
-# API routers
+# =========================
+# CORS
+# =========================
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# =========================
+# API ROUTERS
+# =========================
+
 app.include_router(tracks_router)
 app.include_router(artists_router)
 app.include_router(albums_router)
 
 
-# Static files
+# =========================
+# STATIC STORAGE
+# =========================
+
 app.mount(
     "/storage",
     StaticFiles(directory="/storage"),
     name="storage",
 )
 
+
+# =========================
+# ROOT
+# =========================
 
 @app.get("/")
 def root():
@@ -50,12 +77,20 @@ def root():
     }
 
 
+# =========================
+# HEALTH CHECK
+# =========================
+
 @app.get("/api/health")
 def health():
     return {
         "status": "ok",
     }
 
+
+# =========================
+# STREAM TRACK
+# =========================
 
 @app.get("/api/tracks/{track_id}/stream")
 def stream_track(
