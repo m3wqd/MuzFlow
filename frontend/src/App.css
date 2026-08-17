@@ -914,3 +914,112 @@ body {
 .tag-card-name {
   font-size: 13px;
 }
+.layout {
+  display: flex;
+
+  min-height: calc(100vh - 70px);
+}
+
+
+.sidebar {
+  width: 210px;
+
+  flex-shrink: 0;
+
+  padding: 25px 12px;
+
+  border-right: 1px solid #202020;
+
+  background: #101010;
+}
+
+
+.nav-item {
+  width: 100%;
+
+  padding: 11px 14px;
+
+  margin-bottom: 4px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #888;
+
+  text-align: left;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+
+.nav-item:hover {
+  background: #191919;
+
+  color: #fff;
+}
+
+
+.nav-item.active {
+  background: #242424;
+
+  color: #fff;
+}
+
+
+.logo {
+  cursor: pointer;
+}
+
+
+.track {
+  cursor: pointer;
+}
+
+
+@media (max-width: 700px) {
+
+  .sidebar {
+    position: fixed;
+
+    left: 0;
+    bottom: 70px;
+
+    width: 100%;
+
+    height: 54px;
+
+    padding: 5px;
+
+    display: flex;
+
+    border-right: none;
+
+    border-top: 1px solid #222;
+
+    z-index: 900;
+  }
+
+
+  .nav-item {
+    flex: 1;
+
+    margin: 0;
+
+    padding: 8px 3px;
+
+    text-align: center;
+
+    font-size: 11px;
+  }
+
+
+  .layout {
+    display: block;
+  }
+
+}
