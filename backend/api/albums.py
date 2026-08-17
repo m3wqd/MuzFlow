@@ -12,7 +12,10 @@ router = APIRouter(
 
 
 @router.get("/")
-def get_albums(db: Session = Depends(get_db)):
+def get_albums(
+    db: Session = Depends(get_db),
+):
+
     tracks = (
         db.query(Track)
         .order_by(
@@ -23,15 +26,20 @@ def get_albums(db: Session = Depends(get_db)):
         .all()
     )
 
+
     albums = {}
 
+
     for track in tracks:
+
         key = (
             track.artist,
             track.album,
         )
 
+
         if key not in albums:
+
             albums[key] = {
                 "artist": track.artist,
                 "album": track.album,
@@ -40,6 +48,10 @@ def get_albums(db: Session = Depends(get_db)):
                 "tracks": 0,
             }
 
+
         albums[key]["tracks"] += 1
 
-    return list(albums.values())
+
+    return list(
+        albums.values()
+    )

@@ -1,45 +1,60 @@
 .player {
   position: fixed;
+
   left: 0;
   right: 0;
   bottom: 0;
 
-  height: 88px;
+  height: 82px;
 
   display: flex;
+
   align-items: center;
 
-  padding: 10px 24px;
+  gap: 24px;
 
-  box-sizing: border-box;
+  padding: 10px 22px;
 
-  background: rgba(18, 18, 18, 0.97);
+  background: rgba(15, 15, 15, 0.97);
+
   border-top: 1px solid #292929;
 
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
 
   z-index: 1000;
+
+  box-sizing: border-box;
 }
 
 
-/* EMPTY */
+/* =========================================================
+   EMPTY
+   ========================================================= */
 
 .player-empty {
   justify-content: center;
 
-  color: #777;
+  color: #666;
 
-  font-size: 14px;
+  gap: 10px;
+}
+
+.player-empty-icon {
+  font-size: 20px;
 }
 
 
-/* TRACK */
+/* =========================================================
+   TRACK
+   ========================================================= */
 
 .player-track {
   width: 280px;
+
   min-width: 220px;
 
   display: flex;
+
   align-items: center;
 
   gap: 12px;
@@ -47,16 +62,16 @@
 
 
 .player-cover {
-  width: 58px;
-  height: 58px;
+  width: 56px;
+  height: 56px;
 
   flex-shrink: 0;
 
-  overflow: hidden;
-
   border-radius: 7px;
 
-  background: #242424;
+  overflow: hidden;
+
+  background: #222;
 }
 
 
@@ -64,9 +79,9 @@
   width: 100%;
   height: 100%;
 
-  display: block;
-
   object-fit: cover;
+
+  display: block;
 }
 
 
@@ -75,56 +90,78 @@
   height: 100%;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  color: #777;
-
   font-size: 25px;
+
+  color: #666;
 }
 
 
 .player-info {
   min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
 }
 
 
 .player-title {
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
-
   color: #fff;
 
   font-size: 14px;
 
   font-weight: 600;
-}
 
-
-.player-artist {
-  margin-top: 5px;
+  white-space: nowrap;
 
   overflow: hidden;
 
   text-overflow: ellipsis;
-
-  white-space: nowrap;
-
-  color: #888;
-
-  font-size: 13px;
 }
 
 
-/* CENTER */
+.player-artist {
+  color: #999;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+.player-album {
+  color: #666;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   CENTER
+   ========================================================= */
 
 .player-center {
   flex: 1;
 
-  max-width: 760px;
+  min-width: 0;
+
+  max-width: 750px;
 
   margin: 0 auto;
 
@@ -132,66 +169,80 @@
 
   flex-direction: column;
 
-  gap: 6px;
+  gap: 5px;
 }
 
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 
 .player-buttons {
   display: flex;
 
   align-items: center;
+
   justify-content: center;
 
-  gap: 12px;
+  gap: 8px;
 }
 
 
-.player-button {
-  width: 34px;
-  height: 34px;
+.player-button,
+.player-play-button {
+  border: none;
 
   display: flex;
 
   align-items: center;
+
   justify-content: center;
 
-  padding: 0;
+  cursor: pointer;
 
-  border: none;
+  transition:
+    background 0.15s,
+    transform 0.1s;
+}
+
+
+.player-button {
+  width: 30px;
+  height: 30px;
+
+  border-radius: 50%;
 
   background: transparent;
 
   color: #aaa;
 
-  font-size: 17px;
-
-  cursor: pointer;
-
-  transition:
-    color 0.15s,
-    transform 0.15s;
+  font-size: 16px;
 }
 
 
 .player-button:hover {
-  color: #fff;
+  background: #252525;
 
-  transform: scale(1.08);
+  color: #fff;
+}
+
+
+.player-button:active,
+.player-play-button:active {
+  transform: scale(0.92);
+}
+
+
+.player-button.small {
+  font-size: 11px;
+
+  color: #777;
 }
 
 
 .player-play-button {
-  width: 40px;
-  height: 40px;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-
-  border: none;
+  width: 34px;
+  height: 34px;
 
   border-radius: 50%;
 
@@ -199,88 +250,216 @@
 
   color: #111;
 
-  font-size: 15px;
+  font-size: 13px;
 
-  cursor: pointer;
-
-  transition:
-    transform 0.15s;
+  font-weight: 600;
 }
 
 
 .player-play-button:hover {
-  transform: scale(1.07);
+  background: #ddd;
 }
 
 
-/* PROGRESS */
+.player-play-button:disabled {
+  cursor: default;
+
+  opacity: 0.6;
+}
+
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
 
 .player-progress {
   display: flex;
 
   align-items: center;
 
-  gap: 8px;
+  gap: 9px;
+
+  width: 100%;
+}
+
+
+.player-time {
+  width: 38px;
 
   color: #777;
 
-  font-size: 11px;
+  font-size: 10px;
+
+  text-align: center;
+
+  font-variant-numeric: tabular-nums;
 }
 
 
-.player-progress input {
+.progress-container {
+  position: relative;
+
   flex: 1;
 
-  min-width: 80px;
+  height: 14px;
+
+  display: flex;
+
+  align-items: center;
 }
 
 
-/* VOLUME */
+.progress-background {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  height: 3px;
+
+  border-radius: 3px;
+
+  background: #333;
+}
+
+
+.progress-fill {
+  position: absolute;
+
+  left: 0;
+
+  height: 3px;
+
+  border-radius: 3px;
+
+  background: #fff;
+
+  pointer-events: none;
+}
+
+
+.progress-input {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  width: 100%;
+
+  height: 14px;
+
+  margin: 0;
+
+  opacity: 0;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   VOLUME
+   ========================================================= */
 
 .player-volume {
-  width: 180px;
+  width: 150px;
+
+  min-width: 120px;
 
   display: flex;
 
   align-items: center;
 
-  justify-content: flex-end;
-
   gap: 8px;
 }
 
 
-.player-volume input {
-  width: 100px;
-}
+.volume-button {
+  border: none;
 
-
-/* RANGE */
-
-.player input[type="range"] {
-  height: 4px;
-
-  margin: 0;
+  background: transparent;
 
   cursor: pointer;
 
-  accent-color: #fff;
+  font-size: 16px;
+
+  padding: 4px;
 }
 
 
-/* MOBILE */
+.player-volume input {
+  width: 100%;
 
-@media (max-width: 700px) {
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.player-error {
+  position: absolute;
+
+  bottom: 2px;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  color: #e57373;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   RANGE
+   ========================================================= */
+
+.player-volume input[type="range"] {
+  appearance: none;
+
+  height: 3px;
+
+  border-radius: 3px;
+
+  background: #333;
+
+  outline: none;
+}
+
+
+.player-volume input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: #fff;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
 
   .player {
-    height: 82px;
+    height: 72px;
 
     padding: 8px 12px;
+
+    gap: 10px;
   }
 
 
   .player-track {
-    width: 170px;
+    width: 150px;
 
     min-width: 0;
   }
@@ -292,66 +471,42 @@
   }
 
 
-  .player-info {
-    max-width: 110px;
-  }
-
-
-  .player-center {
-    max-width: none;
-
-    margin: 0;
-  }
-
-
-  .player-buttons {
-    gap: 3px;
-  }
-
-
-  .player-button {
-    width: 30px;
-    height: 30px;
-
-    font-size: 14px;
-  }
-
-
-  .player-play-button {
-    width: 35px;
-    height: 35px;
+  .player-album {
+    display: none;
   }
 
 
   .player-volume {
+    width: 70px;
+
+    min-width: 50px;
+  }
+
+
+  .player-button.small {
     display: none;
   }
 
 }
 
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
 
   .player {
-    height: 76px;
+    height: 70px;
 
-    padding: 7px 10px;
+    gap: 8px;
   }
 
 
   .player-track {
-    width: 125px;
+    width: 120px;
   }
 
 
   .player-cover {
-    width: 44px;
-    height: 44px;
-  }
-
-
-  .player-info {
-    max-width: 75px;
+    width: 42px;
+    height: 42px;
   }
 
 
@@ -361,7 +516,29 @@
 
 
   .player-artist {
-    font-size: 11px;
+    font-size: 10px;
+  }
+
+
+  .player-volume {
+    width: 35px;
+  }
+
+
+  .player-volume input {
+    display: none;
+  }
+
+
+  .player-progress {
+    gap: 4px;
+  }
+
+
+  .player-time {
+    width: 30px;
+
+    font-size: 9px;
   }
 
 }

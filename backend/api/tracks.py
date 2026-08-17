@@ -12,7 +12,9 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.responses import FileResponse
+
 from mutagen import File as MutagenFile
+
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
@@ -87,6 +89,7 @@ def get_first_tag(
         if value:
 
             if isinstance(value, list):
+
                 return str(
                     value[0]
                 ).strip()
@@ -106,10 +109,9 @@ def extract_cover(
     if not audio:
         return False
 
-
-    # =========================
+    # -----------------------------------------------------
     # MP3 / ID3
-    # =========================
+    # -----------------------------------------------------
 
     if audio.tags:
 
@@ -126,10 +128,9 @@ def extract_cover(
 
                 return True
 
-
-    # =========================
+    # -----------------------------------------------------
     # FLAC
-    # =========================
+    # -----------------------------------------------------
 
     pictures = getattr(
         audio,
@@ -144,7 +145,6 @@ def extract_cover(
         )
 
         return True
-
 
     return False
 
@@ -179,18 +179,21 @@ def get_tracks(
 
 
     if artist:
+
         query = query.filter(
             Track.artist == artist
         )
 
 
     if album:
+
         query = query.filter(
             Track.album == album
         )
 
 
     if genre:
+
         query = query.filter(
             Track.genre == genre
         )
@@ -227,27 +230,31 @@ def search_tracks(
 
     return (
         db.query(Track)
-
         .filter(
             or_(
-                Track.title.ilike(search),
+                Track.title.ilike(
+                    search
+                ),
 
-                Track.artist.ilike(search),
+                Track.artist.ilike(
+                    search
+                ),
 
-                Track.album.ilike(search),
+                Track.album.ilike(
+                    search
+                ),
 
-                Track.genre.ilike(search),
+                Track.genre.ilike(
+                    search
+                ),
             )
         )
-
         .order_by(
             Track.artist,
             Track.album,
             Track.title,
         )
-
         .limit(100)
-
         .all()
     )
 
@@ -284,7 +291,7 @@ def get_track(
 
 
 # =========================================================
-# STREAM
+# STREAM TRACK
 # =========================================================
 
 @router.get("/{track_id}/stream")
@@ -311,14 +318,6 @@ def stream_track(
         )
 
 
-    if not track.file_path:
-
-        raise HTTPException(
-            status_code=404,
-            detail="Track file path is missing",
-        )
-
-
     file_path = Path(
         track.file_path
     )
@@ -328,21 +327,11 @@ def stream_track(
 
         raise HTTPException(
             status_code=404,
-            detail=(
-                f"Audio file not found: "
-                f"{file_path}"
-            ),
+            detail="Audio file not found",
         )
 
 
-    extension = (
-        file_path
-        .suffix
-        .lower()
-    )
-
-
-    media_types = {
+    mime_types = {
 
         ".mp3":
             "audio/mpeg",
@@ -356,21 +345,27 @@ def stream_track(
         ".ogg":
             "audio/ogg",
 
+        ".oga":
+            "audio/ogg",
+
         ".m4a":
             "audio/mp4",
 
         ".aac":
             "audio/aac",
+
     }
 
 
-    media_type = media_types.get(
-        extension,
+    media_type = mime_types.get(
+        file_path.suffix.lower(),
+
         "application/octet-stream",
     )
 
 
     return FileResponse(
+
         path=file_path,
 
         media_type=media_type,
@@ -389,6 +384,7 @@ def stream_track(
 
 @router.post("/upload")
 async def upload_track(
+
     file: UploadFile = File(...),
 
     db: Session = Depends(get_db),
@@ -402,27 +398,32 @@ async def upload_track(
         )
 
 
-    extension = (
-        Path(file.filename)
-        .suffix
-        .lower()
-    )
+    extension = Path(
+        file.filename
+    ).suffix.lower()
 
 
     allowed_extensions = {
 
         ".mp3",
+
         ".flac",
+
         ".wav",
+
         ".ogg",
+
         ".m4a",
+
         ".aac",
+
     }
 
 
     if extension not in allowed_extensions:
 
         raise HTTPException(
+
             status_code=400,
 
             detail=(
@@ -432,13 +433,13 @@ async def upload_track(
         )
 
 
-    # =========================
+    # -----------------------------------------------------
     # TEMP FILE
-    # =========================
+    # -----------------------------------------------------
 
     temp_path = (
-        TEMP_DIR /
-        f"{uuid.uuid4()}{extension}"
+        TEMP_DIR
+        / f"{uuid.uuid4()}{extension}"
     )
 
 
@@ -457,12 +458,14 @@ async def upload_track(
                 if not chunk:
                     break
 
-                buffer.write(chunk)
+                buffer.write(
+                    chunk
+                )
 
 
-        # =========================
+        # -------------------------------------------------
         # READ METADATA
-        # =========================
+        # -------------------------------------------------
 
         audio = MutagenFile(
             temp_path,
@@ -473,7 +476,9 @@ async def upload_track(
         if audio is None:
 
             raise HTTPException(
+
                 status_code=400,
+
                 detail=(
                     "Could not read "
                     "audio metadata"
@@ -489,10 +494,9 @@ async def upload_track(
 
         if not title:
 
-            title = (
-                Path(file.filename)
-                .stem
-            )
+            title = Path(
+                file.filename
+            ).stem
 
 
         artist = get_first_tag(
@@ -545,9 +549,9 @@ async def upload_track(
                 )
 
 
-        # =========================
+        # -------------------------------------------------
         # CLEAN METADATA
-        # =========================
+        # -------------------------------------------------
 
         artist = clean_name(
             artist,
@@ -563,7 +567,9 @@ async def upload_track(
 
         title = clean_name(
             title,
-            Path(file.filename).stem,
+            Path(
+                file.filename
+            ).stem,
         )
 
 
@@ -573,19 +579,19 @@ async def upload_track(
         )
 
 
-        # =========================
+        # -------------------------------------------------
         # CREATE DIRECTORIES
-        # =========================
+        # -------------------------------------------------
 
         artist_dir = (
-            MUSIC_DIR /
-            artist
+            MUSIC_DIR
+            / artist
         )
 
 
         album_dir = (
-            artist_dir /
-            album
+            artist_dir
+            / album
         )
 
 
@@ -595,9 +601,9 @@ async def upload_track(
         )
 
 
-        # =========================
+        # -------------------------------------------------
         # FINAL FILE
-        # =========================
+        # -------------------------------------------------
 
         final_filename = (
             f"{title}{extension}"
@@ -605,8 +611,8 @@ async def upload_track(
 
 
         final_path = (
-            album_dir /
-            final_filename
+            album_dir
+            / final_filename
         )
 
 
@@ -618,9 +624,10 @@ async def upload_track(
                 f"{extension}"
             )
 
+
             final_path = (
-                album_dir /
-                final_filename
+                album_dir
+                / final_filename
             )
 
 
@@ -630,9 +637,9 @@ async def upload_track(
         )
 
 
-        # =========================
-        # FULL METADATA
-        # =========================
+        # -------------------------------------------------
+        # READ ORIGINAL AUDIO
+        # -------------------------------------------------
 
         original_audio = MutagenFile(
             final_path,
@@ -640,14 +647,14 @@ async def upload_track(
         )
 
 
-        # =========================
+        # -------------------------------------------------
         # COVER
-        # =========================
+        # -------------------------------------------------
 
         cover_path = None
 
 
-        if original_audio:
+        if original_audio is not None:
 
             cover_filename = (
                 f"{uuid.uuid4()}.jpg"
@@ -655,8 +662,8 @@ async def upload_track(
 
 
             possible_cover_path = (
-                COVERS_DIR /
-                cover_filename
+                COVERS_DIR
+                / cover_filename
             )
 
 
@@ -670,14 +677,14 @@ async def upload_track(
                 )
 
 
-        # =========================
+        # -------------------------------------------------
         # DURATION
-        # =========================
+        # -------------------------------------------------
 
         duration = None
 
 
-        if original_audio:
+        if original_audio is not None:
 
             try:
 
@@ -695,9 +702,9 @@ async def upload_track(
                 duration = None
 
 
-        # =========================
+        # -------------------------------------------------
         # DATABASE
-        # =========================
+        # -------------------------------------------------
 
         track = Track(
 
@@ -720,6 +727,7 @@ async def upload_track(
             ),
 
             cover_path=cover_path,
+
         )
 
 
@@ -749,12 +757,14 @@ async def upload_track(
         )
 
         print(
-            "UPLOAD ERROR:",
-            repr(error),
+            "Upload error:",
+            error,
         )
 
         raise HTTPException(
+
             status_code=500,
+
             detail=(
                 "Failed to upload track"
             ),
@@ -767,6 +777,7 @@ async def upload_track(
 
 @router.delete("/{track_id}")
 def delete_track(
+
     track_id: int,
 
     db: Session = Depends(get_db),
@@ -784,14 +795,16 @@ def delete_track(
     if not track:
 
         raise HTTPException(
+
             status_code=404,
+
             detail="Track not found",
         )
 
 
-    # =========================
-    # AUDIO FILE
-    # =========================
+    # -----------------------------------------------------
+    # AUDIO
+    # -----------------------------------------------------
 
     if track.file_path:
 
@@ -799,14 +812,15 @@ def delete_track(
             track.file_path
         )
 
+
         if file_path.exists():
 
             file_path.unlink()
 
 
-    # =========================
+    # -----------------------------------------------------
     # COVER
-    # =========================
+    # -----------------------------------------------------
 
     if track.cover_path:
 
@@ -814,14 +828,15 @@ def delete_track(
             track.cover_path
         )
 
+
         if cover_path.exists():
 
             cover_path.unlink()
 
 
-    # =========================
+    # -----------------------------------------------------
     # DATABASE
-    # =========================
+    # -----------------------------------------------------
 
     db.delete(track)
 
@@ -829,6 +844,10 @@ def delete_track(
 
 
     return {
+
         "status": "ok",
-        "message": "Track deleted",
+
+        "message":
+            "Track deleted",
+
     }

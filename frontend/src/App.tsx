@@ -1,4 +1,8 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import axios from "axios";
 
 import Player from "./components/Player";
@@ -7,57 +11,83 @@ import UploadModal from "./components/UploadModal";
 import "./App.css";
 
 
-const API_URL = "http://localhost:8000";
+const API_URL =
+  "http://localhost:8000";
 
 
 interface Track {
   id: number;
+
   title: string;
+
   artist: string | null;
+
   album: string | null;
+
+  album_artist?: string | null;
+
   genre: string | null;
+
   year: number | null;
+
   duration: number | null;
+
   cover_path: string | null;
+
   file_path: string;
 }
 
 
 function App() {
-  const [tracks, setTracks] = useState<Track[]>([]);
+
+  const [tracks, setTracks] =
+    useState<Track[]>([]);
+
 
   const [currentTrack, setCurrentTrack] =
     useState<Track | null>(null);
 
+
   const [loading, setLoading] =
     useState(true);
 
+
   const [searchQuery, setSearchQuery] =
     useState("");
+
 
   const [uploadOpen, setUploadOpen] =
     useState(false);
 
 
-  // =========================
+  // =====================================================
   // LOAD TRACKS
-  // =========================
+  // =====================================================
 
   useEffect(() => {
+
     loadTracks();
+
   }, []);
 
 
   async function loadTracks() {
+
     try {
+
       setLoading(true);
+
 
       const response =
         await axios.get<Track[]>(
           `${API_URL}/api/tracks/`
         );
 
-      setTracks(response.data);
+
+      setTracks(
+        response.data
+      );
+
 
     } catch (error) {
 
@@ -66,30 +96,37 @@ function App() {
         error
       );
 
+
     } finally {
 
       setLoading(false);
 
     }
+
   }
 
 
-  // =========================
+  // =====================================================
   // SEARCH
-  // =========================
+  // =====================================================
 
   async function searchTracks(
     query: string
   ) {
+
     if (!query.trim()) {
+
       await loadTracks();
+
       return;
+
     }
 
 
     try {
 
       setLoading(true);
+
 
       const response =
         await axios.get<Track[]>(
@@ -101,7 +138,11 @@ function App() {
           }
         );
 
-      setTracks(response.data);
+
+      setTracks(
+        response.data
+      );
+
 
     } catch (error) {
 
@@ -110,40 +151,54 @@ function App() {
         error
       );
 
+
     } finally {
 
       setLoading(false);
 
     }
+
   }
 
 
   function handleSearch(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
+
     const value =
       event.target.value;
 
-    setSearchQuery(value);
 
-    searchTracks(value);
+    setSearchQuery(
+      value
+    );
+
+
+    searchTracks(
+      value
+    );
+
   }
 
 
-  // =========================
+  // =====================================================
   // PLAY
-  // =========================
+  // =====================================================
 
   function playTrack(
     track: Track
   ) {
-    setCurrentTrack(track);
+
+    setCurrentTrack(
+      track
+    );
+
   }
 
 
-  // =========================
+  // =====================================================
   // NEXT
-  // =========================
+  // =====================================================
 
   function playNext() {
 
@@ -171,19 +226,24 @@ function App() {
       currentIndex >=
       tracks.length - 1
     ) {
+
       return;
+
     }
 
 
     setCurrentTrack(
-      tracks[currentIndex + 1]
+      tracks[
+        currentIndex + 1
+      ]
     );
+
   }
 
 
-  // =========================
+  // =====================================================
   // PREVIOUS
-  // =========================
+  // =====================================================
 
   function playPrevious() {
 
@@ -203,19 +263,24 @@ function App() {
     if (
       currentIndex <= 0
     ) {
+
       return;
+
     }
 
 
     setCurrentTrack(
-      tracks[currentIndex - 1]
+      tracks[
+        currentIndex - 1
+      ]
     );
+
   }
 
 
-  // =========================
+  // =====================================================
   // DELETE
-  // =========================
+  // =====================================================
 
   async function deleteTrack(
     track: Track
@@ -239,16 +304,29 @@ function App() {
       );
 
 
-      // Если удаляемый трек играет
+      /*
+       * Если удаляем текущий трек,
+       * останавливаем плеер.
+       */
+
       if (
         currentTrack?.id ===
         track.id
       ) {
-        setCurrentTrack(null);
+
+        setCurrentTrack(
+          null
+        );
+
       }
 
 
+      /*
+       * Обновляем библиотеку.
+       */
+
       await loadTracks();
+
 
     } catch (error) {
 
@@ -261,36 +339,43 @@ function App() {
       alert(
         "Не удалось удалить трек."
       );
+
     }
+
   }
 
 
-  // =========================
+  // =====================================================
   // UPLOAD COMPLETE
-  // =========================
+  // =====================================================
 
   function handleUploaded() {
+
     loadTracks();
+
   }
 
 
-  // =========================
+  // =====================================================
   // UI
-  // =========================
+  // =====================================================
 
   return (
 
     <div className="app">
 
 
-      {/* ===================== */}
-      {/* HEADER */}
-      {/* ===================== */}
+      {/* =================================================
+          HEADER
+          ================================================= */}
 
       <header className="header">
 
+
         <div className="logo">
+
           MuzFlow
+
         </div>
 
 
@@ -299,7 +384,9 @@ function App() {
           type="text"
           placeholder="Поиск музыки..."
           value={searchQuery}
-          onChange={handleSearch}
+          onChange={
+            handleSearch
+          }
         />
 
 
@@ -309,64 +396,86 @@ function App() {
             setUploadOpen(true)
           }
         >
+
           + Загрузить
+
         </button>
+
 
       </header>
 
 
-      {/* ===================== */}
-      {/* MAIN */}
-      {/* ===================== */}
+      {/* =================================================
+          MAIN
+          ================================================= */}
 
       <main className="content">
 
 
         <div className="content-header">
 
+
           <h1>
+
             Моя музыка
+
           </h1>
 
 
           <span className="track-count">
+
             {tracks.length} треков
+
           </span>
+
 
         </div>
 
 
-        {/* LOADING */}
+        {/* =================================================
+            LOADING
+            ================================================= */}
 
         {loading && (
 
           <div className="loading">
+
             Загружаем библиотеку...
+
           </div>
 
         )}
 
 
-        {/* EMPTY */}
+        {/* =================================================
+            EMPTY
+            ================================================= */}
 
         {!loading &&
           tracks.length === 0 && (
 
             <div className="empty-library">
 
+
               <div className="empty-icon">
+
                 ♪
+
               </div>
 
 
               <h2>
+
                 Музыки пока нет
+
               </h2>
 
 
               <p>
+
                 Загрузите первый трек,
                 чтобы начать слушать.
+
               </p>
 
 
@@ -376,17 +485,20 @@ function App() {
                   setUploadOpen(true)
                 }
               >
+
                 + Загрузить музыку
+
               </button>
+
 
             </div>
 
           )}
 
 
-        {/* ===================== */}
-        {/* TRACK LIST */}
-        {/* ===================== */}
+        {/* =================================================
+            TRACK LIST
+            ================================================= */}
 
         {!loading &&
           tracks.length > 0 && (
@@ -395,7 +507,10 @@ function App() {
 
 
               {tracks.map(
-                (track, index) => (
+                (
+                  track,
+                  index
+                ) => (
 
                   <div
                     className={`track ${
@@ -405,163 +520,251 @@ function App() {
                         : ""
                     }`}
                     key={track.id}
+
+                    /*
+                     * ВСЯ СТРОКА
+                     * КЛИКАБЕЛЬНАЯ
+                     */
+
+                    onClick={() =>
+                      playTrack(
+                        track
+                      )
+                    }
                   >
 
 
-                    {/* NUMBER */}
+                    {/* =================================
+                        NUMBER
+                        ================================= */}
 
                     <div className="track-number">
+
                       {index + 1}
+
                     </div>
 
 
-                    {/* COVER */}
+                    {/* =================================
+                        COVER
+                        ================================= */}
 
                     <div className="cover">
+
 
                       {track.cover_path ? (
 
                         <img
-                          src={`${API_URL}${track.cover_path}`}
-                          alt={track.title}
+                          src={
+                            `${API_URL}${track.cover_path}`
+                          }
+                          alt={
+                            track.title
+                          }
                         />
 
                       ) : (
 
                         <div className="no-cover">
+
                           ♪
+
                         </div>
 
                       )}
 
+
                     </div>
 
 
-                    {/* INFO */}
+                    {/* =================================
+                        INFO
+                        ================================= */}
 
-                    <div
-                      className="track-info"
-                      onDoubleClick={() =>
-                        playTrack(track)
-                      }
-                    >
+                    <div className="track-info">
 
-                      <div
-                        className="track-title"
-                      >
+
+                      <div className="track-title">
+
                         {track.title}
+
                       </div>
 
 
-                      <div
-                        className="track-artist"
-                      >
+                      <div className="track-artist">
+
                         {track.artist ??
                           "Unknown Artist"}
+
                       </div>
 
 
-                      <div
-                        className="track-album"
-                      >
+                      <div className="track-album">
+
                         {track.album ??
                           "Unknown Album"}
+
                       </div>
 
+
                     </div>
 
 
-                    {/* YEAR */}
+                    {/* =================================
+                        YEAR
+                        ================================= */}
 
-                    <div
-                      className="track-year"
-                    >
-                      {track.year ?? "—"}
+                    <div className="track-year">
+
+                      {track.year ??
+                        "—"}
+
                     </div>
 
 
-                    {/* GENRE */}
+                    {/* =================================
+                        GENRE
+                        ================================= */}
 
-                    <div
-                      className="track-genre"
-                    >
-                      {track.genre ?? "—"}
+                    <div className="track-genre">
+
+                      {track.genre ??
+                        "—"}
+
                     </div>
 
 
-                    {/* PLAY */}
+                    {/* =================================
+                        PLAY
+                        ================================= */}
 
                     <button
                       className="track-play"
-                      onClick={() =>
-                        playTrack(track)
-                      }
+
+                      onClick={(
+                        event
+                      ) => {
+
+                        /*
+                         * Не даём клику
+                         * всплыть до строки.
+                         */
+
+                        event.stopPropagation();
+
+
+                        playTrack(
+                          track
+                        );
+
+                      }}
+
                       title="Воспроизвести"
                     >
 
                       {currentTrack?.id ===
                       track.id
+
                         ? "⏸"
+
                         : "▶"}
 
                     </button>
 
 
-                    {/* DELETE */}
+                    {/* =================================
+                        DELETE
+                        ================================= */}
 
                     <button
                       className="track-delete"
-                      onClick={() =>
-                        deleteTrack(track)
-                      }
+
+                      onClick={(
+                        event
+                      ) => {
+
+                        /*
+                         * Не запускаем
+                         * трек при удалении.
+                         */
+
+                        event.stopPropagation();
+
+
+                        deleteTrack(
+                          track
+                        );
+
+                      }}
+
                       title="Удалить трек"
                     >
+
                       ×
+
                     </button>
+
 
                   </div>
 
                 )
               )}
 
+
             </div>
 
           )}
 
+
       </main>
 
 
-      {/* ===================== */}
-      {/* PLAYER */}
-      {/* ===================== */}
+      {/* =================================================
+          PLAYER
+          ================================================= */}
 
       <Player
-        track={currentTrack}
-        onNext={playNext}
-        onPrevious={playPrevious}
+        track={
+          currentTrack
+        }
+
+        onNext={
+          playNext
+        }
+
+        onPrevious={
+          playPrevious
+        }
       />
 
 
-      {/* ===================== */}
-      {/* UPLOAD MODAL */}
-      {/* ===================== */}
+      {/* =================================================
+          UPLOAD MODAL
+          ================================================= */}
 
       {uploadOpen && (
 
         <UploadModal
+
           onClose={() =>
-            setUploadOpen(false)
+            setUploadOpen(
+              false
+            )
           }
+
           onUploaded={
             handleUploaded
           }
+
         />
 
       )}
 
+
     </div>
 
   );
+
 }
 
 

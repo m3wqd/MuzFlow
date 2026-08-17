@@ -13,11 +13,17 @@ router = APIRouter(
 
 
 @router.get("/")
-def get_artists(db: Session = Depends(get_db)):
+def get_artists(
+    db: Session = Depends(get_db),
+):
     artists = (
         db.query(distinct(Track.artist))
-        .filter(Track.artist.isnot(None))
-        .order_by(Track.artist)
+        .filter(
+            Track.artist.isnot(None)
+        )
+        .order_by(
+            Track.artist
+        )
         .all()
     )
 

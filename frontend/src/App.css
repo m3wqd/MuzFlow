@@ -526,3 +526,391 @@ body {
   background: #2a1b1b;
   color: #ff6b6b;
 }
+/* =========================================================
+   TAG FILTERS
+   ========================================================= */
+
+.tag-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 20px;
+
+  overflow-x: auto;
+
+  scrollbar-width: none;
+}
+
+.tag-filters::-webkit-scrollbar {
+  display: none;
+}
+
+
+.tag-filter {
+  flex-shrink: 0;
+
+  padding: 7px 14px;
+
+  border: 1px solid #2d2d2d;
+  border-radius: 999px;
+
+  background: #181818;
+
+  color: #999;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+
+.tag-filter:hover {
+  color: #fff;
+
+  border-color: #444;
+}
+
+
+.tag-filter.active {
+  background: #fff;
+
+  border-color: #fff;
+
+  color: #111;
+}
+
+
+/* =========================================================
+   TRACK TAGS
+   ========================================================= */
+
+.track-tags {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  margin-top: 7px;
+
+  min-height: 20px;
+
+  flex-wrap: wrap;
+}
+
+
+.track-tag {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 2px 7px;
+
+  border-radius: 5px;
+
+  background: #252525;
+
+  color: #aaa;
+
+  font-size: 10px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+
+.track-tag:hover {
+  background: #333;
+
+  color: #fff;
+}
+
+
+.tag-remove {
+  color: #666;
+
+  font-size: 11px;
+}
+
+
+.track-tag:hover .tag-remove {
+  color: #fff;
+}
+
+
+/* =========================================================
+   ADD TAG
+   ========================================================= */
+
+.add-tag-button {
+  width: 20px;
+  height: 20px;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #333;
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #777;
+
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+
+.add-tag-button:hover {
+  background: #292929;
+
+  color: #fff;
+
+  border-color: #555;
+}
+
+
+.add-tag-button:disabled {
+  opacity: 0.4;
+
+  cursor: default;
+}
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-button {
+  border: none;
+  background: transparent;
+  color: #777;
+  padding: 8px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.nav-button:hover {
+  color: #fff;
+  background: #1d1d1d;
+}
+
+.nav-button.active {
+  color: #fff;
+  background: #252525;
+}
+
+
+/* =========================================================
+   ARTISTS
+   ========================================================= */
+
+.artists-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fill, minmax(180px, 1fr));
+
+  gap: 16px;
+}
+
+.artist-card {
+  border: 1px solid #222;
+  background: #151515;
+  border-radius: 12px;
+  padding: 20px;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+
+  transition:
+    transform 0.15s,
+    background 0.15s;
+}
+
+.artist-card:hover {
+  background: #202020;
+  transform: translateY(-2px);
+}
+
+.artist-avatar {
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #292929;
+
+  font-size: 28px;
+  font-weight: 600;
+
+  margin-bottom: 14px;
+}
+
+.artist-name {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   ALBUMS
+   ========================================================= */
+
+.albums-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fill, minmax(180px, 1fr));
+
+  gap: 20px;
+}
+
+.album-card {
+  border: none;
+  background: transparent;
+
+  color: #fff;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  padding: 0;
+}
+
+.album-cover {
+  width: 100%;
+  aspect-ratio: 1;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  background: #191919;
+
+  margin-bottom: 10px;
+}
+
+.album-cover img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+.album-no-cover {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 40px;
+
+  color: #555;
+}
+
+.album-name {
+  font-size: 14px;
+  font-weight: 600;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.album-artist {
+  color: #888;
+
+  font-size: 13px;
+
+  margin-top: 4px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.album-meta {
+  color: #555;
+
+  font-size: 11px;
+
+  margin-top: 5px;
+}
+
+
+/* =========================================================
+   TAGS PAGE
+   ========================================================= */
+
+.tags-grid {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+}
+
+.tag-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  border: 1px solid #292929;
+
+  background: #171717;
+
+  color: #aaa;
+
+  padding: 10px 14px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.tag-card:hover {
+  background: #242424;
+  color: #fff;
+}
+
+.tag-card-icon {
+  color: #666;
+}
+
+.tag-card-name {
+  font-size: 13px;
+}
